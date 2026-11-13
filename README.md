@@ -162,7 +162,7 @@ This project was developed as a Capstone Senior Design Project at North South Un
 
 *Color-coded longitudinal progression across clinical follow-ups—Day 01 (red), Day 42 (green), Day 84 (yellow), and Day 275 (blue)—shown inside a shared semi-transparent brain reference (top row, a–e) and as isolated tumor surfaces (bottom row, f–i)[cite: 24].*
 
----
+### 3. Longitudinal tumor volume trajectory
 
 ![Sample Patient 60-Day Forecast](results/graphs/PatientID_0003_forecast.png)
 
