@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+/* ------------------------
+   BACKGROUND + GLOBAL STYLE
+------------------------- */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #0a0a0a;
+  color: #ffffff;
+}
+
+/* ------------------------
+   CONTAINER
+------------------------- */
+.forecast-container {
+  padding: 80px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.forecast-card {
+  width: 100%;
+  max-width: 500px;
+  background: rgba(14, 38, 41, 0.85));
+  border: 1px solid rgba(255,215,0,0.3);
+  padding: 35px;
+  border-radius: 20px;
+  backdrop-filter: blur(6px);
+  text-align: center;
+}
+
+/* ------------------------
+   TITLES + TEXT
+------------------------- */
+.forecast-card h1 {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #FFD700;
+  margin-bottom: 10px;
+}
+
+.forecast-card p {
+  font-size: 1rem;
+  opacity: 0.8;
+  margin-bottom: 25px;
+}
+
+/* ------------------------
+   DROPDOWN
+------------------------- */
+label {
+  display: block;
+  text-align: left;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 1rem;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,215,0,0.5);
+  color: white;
+  margin-bottom: 15px;
+}
+
+select option {
+  color: black;
+}
+
+/* ------------------------
+   BUTTON
+------------------------- */
+button {
+  width: 100%;
+  padding: 14px;
+  background: #FFD700;
+  color: black;
+  border: none;
+  border-radius: 30px;
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+button:hover {
+  background: #FFC700;
+}
+
+/* ------------------------
+   TIP BOX
+------------------------- */
+.tip-box {
+  margin-top: 18px;
+  padding: 10px;
+  background: rgba(7, 205, 73, 0.12);
+  border-left: 3px solid #FFD700;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+</style>
+
+<div class="forecast-container">
+  <div class="forecast-card">
+
+    <h1>Tumor Growth Forecast</h1>
+    <p>Select a patient to view the AI-generated tumor growth forecast.</p>
+
+    <!-- Dropdown -->
+    <label for="patientSelect">Select Patient</label>
+    <select id="patientSelect">
+      <option value="">-- Choose Patient --</option>
+      {% for p in patients %}
+      <option value="{{ p.name }}">{{ p.name }}</option>
+      {% endfor %}
+    </select>
+
+    <!-- Button -->
+    <button onclick="openForecast()">🔍 View Forecast</button>
+
+    <div class="tip-box">
+      💡 Forecast opens in a new tab so you can compare multiple patients easily.
+    </div>
+
+  </div>
+</div>
+
+<script>
+function openForecast() {
+  const patient = document.getElementById("patientSelect").value;
+
+  if (!patient) {
+    alert("⚠️ Please select a patient first.");
+    return;
+  }
+
+  const url = `/forecast_visualization/${encodeURIComponent(patient)}`;
+  window.open(url, "_blank");
+}
+</script>
+
+{% endblock %}

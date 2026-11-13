@@ -1,0 +1,26 @@
+# Python & Virtual Environment
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+
+# IDE & Tools
+.vscode/
+.idea/
+.qodo/
+.DS_Store
+
+# Model Weights & Artifacts (Host on GitHub Releases / Hugging Face)
+*.pt
+*.pth
+*.npz
+
+# Medical Imaging Data & Temporary Outputs
+uploads/*
+!uploads/.gitkeep
+outputs/*
+!outputs/.gitkeep
+*.nii
+*.nii.gz

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% set active = "timepoints" %}
+{% block content %}
+
+<div class="container-fluid">
+  <h2 class="mb-3">🕒 Processed Patients & Timepoints</h2>
+  <p class="text-muted mb-4">Below are all patients with their processed MRI timepoints and segmentation results.</p>
+
+  {% if patients|length == 0 %}
+    <div class="alert alert-info">No processed patients found. Please upload data first.</div>
+  {% else %}
+    {% for patient in patients %}
+      <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">👤 {{ patient.name }}</h5>
+          <div>
+            <a href="/forecast_page" class="btn btn-sm btn-outline-primary">Forecast</a>
+            <a href="/view_visualization/{{ patient.name }}/combined" class="btn btn-sm btn-outline-info" target="_blank">3D View</a>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          {% if patient.timepoints|length == 0 %}
+            <div class="p-3 text-muted">No timepoints processed for this patient yet.</div>
+          {% else %}
+            <table class="table table-striped mb-0 align-middle">
+              <thead class="table-secondary">
+                <tr>
+                  <th style="width:30%">Timepoint</th>
+                  <th style="width:20%">Mask</th>
+                  <th style="width:20%">Overlay</th>
+                  <th style="width:30%">3D Visualization</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for tp in patient.timepoints %}
+                <tr>
+                  <td><strong>{{ tp.name }}</strong></td>
+                  <td>
+                    {% if tp.mask_exists %}
+                      <a href="/download/{{ patient.name }}/{{ tp.name }}/pred_mask.nii" class="btn btn-sm btn-outline-success" target="_blank">Download</a>
+                    {% else %}
+                      <span class="text-muted">N/A</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if tp.overlay_exists %}
+                      <a href="/download/{{ patient.name }}/{{ tp.name }}/overlaid.nii" class="btn btn-sm btn-outline-primary" target="_blank">Download</a>
+                    {% else %}
+                      <span class="text-muted">N/A</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <a href="/view_visualization/{{ patient.name }}/{{ tp.name | replace('Day_', '') }}" target="_blank"
+                       class="btn btn-sm btn-outline-info">View 3D</a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+{% endblock %}

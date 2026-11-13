@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+{% set active = "viz" %}
+{% block content %}
+
+<style>
+/* PAGE WRAPPER */
+.viz-wrapper {
+    padding: 60px 40px;
+    max-width: 1400px;
+    margin: auto;
+    position: relative;
+    z-index: 2;
+    color: #fff;
+}
+
+/* HEADER */
+.viz-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+.viz-header h1 {
+    font-size: 3rem;
+    font-weight: 900;
+    color: #FFD700;
+    text-transform: uppercase;
+}
+.viz-header p {
+    opacity: 0.8;
+    font-size: 1.1rem;
+}
+
+/* CARD */
+.viz-card {
+    background: rgba(0, 0, 0, 0.45); /* black + 45% opacity */
+    border: 1px solid rgba(255, 215, 0, 0.35);
+    padding: 30px;
+    border-radius: 18px;
+    backdrop-filter: blur(10px); /* frosted glass effect */
+    margin-bottom: 35px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+
+/* LABELS & DROPDOWNS */
+label {
+    font-weight: 700;
+    color: #FFD700;
+}
+select {
+    width: 100%;
+    padding: 14px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(255,215,0,0.4);
+    color: #fff;
+    margin-top: 5px;
+}
+select option { color: black; }
+
+/* BUTTONS */
+.viz-btn {
+    padding: 12px 20px;
+    background: transparent;
+    border: 2px solid #FFD700;
+    border-radius: 10px;
+    color: #FFD700;
+    font-weight: 700;
+    text-transform: uppercase;
+    transition: 0.25s;
+}
+.viz-btn:hover {
+    background: #FFD700;
+    color: #000;
+}
+
+/* TIMEPOINT BUTTONS */
+.day-btn {
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: rgba(255,215,0,0.15);
+    border: 1px solid #FFD700;
+    color: #FFD700;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s;
+}
+.day-btn:hover {
+    background: #FFD700;
+    color: #000;
+}
+
+/* SEMI-TRANSPARENT VISUALIZATION FRAME */
+.viz-frame-box {
+    background: rgba(10,10,10,0.20);  /* semi transparent */
+    border: 1px solid rgba(255,215,0,0.25);
+    border-radius: 16px;
+    padding: 20px;
+    position: relative;
+    margin-top: 10px;
+    display: none;
+    backdrop-filter: blur(3px);
+}
+
+/* IFRAME */
+iframe {
+    width: 100%;
+    height: 600px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent !important;
+}
+
+/* SPINNER OVER IFRAME */
+.inner-loading-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 12px;
+    transition: opacity 0.3s ease;
+    z-index: 50;
+}
+.inner-loading-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.spinner {
+    width: 45px;
+    height: 45px;
+    border: 4px solid rgba(255,255,255,0.3);
+    border-top: 4px solid #FFD700;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text {
+    margin-top: 12px;
+    color: #FFD700;
+    font-weight: 600;
+}
+</style>
+
+<div class="viz-wrapper">
+
+    <!-- HEADER -->
+    <div class="viz-header">
+        <h1>3D Tumor Visualization</h1>
+        <p>Explore patient-specific 3D tumor analysis and segmentation renders.</p>
+    </div>
+
+    <!-- CONTROL PANEL -->
+    <div class="viz-card">
+        <div class="row g-4 align-items-end">
+
+            <div class="col-md-5">
+                <label>Select Patient</label>
+                <select id="viz-patient">
+                    <option value="">-- Choose Patient --</option>
+                    {% for p in patients %}
+                    <option value="{{ p.name }}">{{ p.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-5">
+                <label>Available Days</label>
+                <div id="viz-days-container" style="opacity:0.7">Please select a patient.</div>
+            </div>
+
+            <div class="col-md-2 text-end">
+                <button id="viz-all-btn" class="viz-btn d-none">View All Days</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SEMI-TRANSPARENT VISUALIZATION FRAME -->
+    <div id="viz-frame" class="viz-frame-box">
+        <iframe id="viz-iframe" src="" allowtransparency="true"></iframe>
+
+        <div id="viz-inner-loading" class="inner-loading-overlay hidden">
+            <div class="spinner"></div>
+            <p class="loading-text">Loading visualization...</p>
+        </div>
+    </div>
+
+</div>
+
+<script>
+const vizPatient = document.getElementById("viz-patient");
+const daysContainer = document.getElementById("viz-days-container");
+const vizFrame = document.getElementById("viz-frame");
+const vizIframe = document.getElementById("viz-iframe");
+const vizAllBtn = document.getElementById("viz-all-btn");
+const innerLoading = document.getElementById("viz-inner-loading");
+
+function showInnerLoading() {
+    innerLoading.classList.remove("hidden");
+}
+function hideInnerLoading() {
+    innerLoading.classList.add("hidden");
+}
+
+/* LOAD TIMEPOINTS */
+vizPatient.addEventListener("change", async () => {
+    const pid = vizPatient.value;
+
+    if (!pid) {
+        daysContainer.innerHTML = "Please select a patient.";
+        vizFrame.style.display = "none";
+        vizAllBtn.classList.add("d-none");
+        return;
+    }
+
+    daysContainer.innerHTML = "Loading days...";
+
+    try {
+        const res = await fetch(`/get_days/${encodeURIComponent(pid)}`);
+        const data = await res.json();
+
+        if (data.error) {
+            daysContainer.innerHTML = `<span style='color:#ff6b6b'>${data.error}</span>`;
+            return;
+        }
+
+        if (data.days.length === 0) {
+            daysContainer.innerHTML = "<em>No available timepoints.</em>";
+            return;
+        }
+
+        let html = "<div class='d-flex flex-wrap gap-2'>";
+        data.days.forEach(day => {
+            html += `<button class="day-btn" onclick='openViz("${pid}", ${day})'>Day ${day}</button>`;
+        });
+        html += "</div>";
+        daysContainer.innerHTML = html;
+
+        vizAllBtn.classList.remove("d-none");
+        vizAllBtn.onclick = () => openViz(pid, "combined");
+
+    } catch (err) {
+        daysContainer.innerHTML = `<span style='color:#ff6b6b'>${err.message}</span>`;
+    }
+});
+
+/* LOAD VISUALIZATION */
+function openViz(pid, day) {
+    const url = `/view_visualization/${encodeURIComponent(pid)}/${day}`;
+    showInnerLoading();
+    vizIframe.src = url;
+
+    vizFrame.style.display = "block";
+    window.scrollTo({ top: vizFrame.offsetTop - 60, behavior: "smooth" });
+
+    vizIframe.onload = () => hideInnerLoading();
+    setTimeout(() => hideInnerLoading(), 20000);
+}
+</script>
+
+{% endblock %}
