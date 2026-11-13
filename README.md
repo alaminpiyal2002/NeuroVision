@@ -2,6 +2,14 @@
 
 NeuroVision is an end-to-end deep learning web platform designed for automated multimodal 3D brain tumor segmentation, interactive 3D WebGL visualization, and longitudinal tumor volume forecasting. Built with Flask, PyTorch, MONAI, and Plotly, the system streamlines post-treatment glioma monitoring by converting raw 3D MRI scans into quantitative volumetric trajectories and interactive 3D anatomical models.
 
+## Web Application Preview
+
+![NeuroVision Web Application Overview](static/img/web_overview.jpg)
+
+*Overview of the NeuroVision platform: Home Dashboard (top-left), Multimodal MRI & ZIP Dataset Upload (top-right), Interactive 3D Tumor Visualization (bottom-left), and 60-Day Tumor Forecast Results (bottom-right).*
+
+---
+
 ## Table of Contents
 
  1. [Overview & Clinical Motivation](#overview--clinical-motivation)
