@@ -1,4 +1,9 @@
 # NeuroVision: 3D Brain Tumor Segmentation & Temporal Growth Forecasting
+![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.1+-EE4C2C?logo=pytorch&logoColor=white)
+![MONAI](https://img.shields.io/badge/MONAI-1.3+-00A88F)
+![Flask](https://img.shields.io/badge/Flask-2.3+-000000?logo=flask&logoColor=white)
+![Plotly](https://img.shields.io/badge/Plotly-3D_WebGL-3F4F75?logo=plotly&logoColor=white)
 
 NeuroVision is an end-to-end deep learning web platform designed for automated multimodal 3D brain tumor segmentation, interactive 3D WebGL visualization, and longitudinal tumor volume forecasting. Built with Flask, PyTorch, MONAI, and Plotly, the system streamlines post-treatment glioma monitoring by converting raw 3D MRI scans into quantitative volumetric trajectories and interactive 3D anatomical models.
 
@@ -65,6 +70,7 @@ NeuroVision addresses these challenges within a single unified web interface:
 * **60-Day Quantile Growth Forecasting:** Uses Piecewise Cubic Hermite Interpolating Polynomial (PCHIP) interpolation to convert irregular follow-up dates into continuous daily time series, followed by autoregressive 60-day forecasting with median (`P50`) and 80% confidence interval (`P10`–`P90`) predictions.
 
 * **Automated Phase Detection & Clinical Summary:** Automatically identifies shrinking, regrowth, or stable tumor phases and presents a visual timeline alongside statistical summaries.
+
 
 ## System Workflow
 
@@ -142,6 +148,15 @@ This project was developed as a Capstone Senior Design Project at North South Un
 * **Research Architecture:** Weighted soft-voting ensemble combining a **Modified Vanilla Transformer**, **Bidirectional LSTM (Bi-LSTM)**, and **Temporal Fusion Transformer (TFT)**, achieving a test Mean Absolute Error (MAE) of `84.60 mm³`.
 
 * **Web Deployment Backbone:** Deployed using `TransformerQuantileDelta` (`d_model=96`, `nhead=4`, `num_layers=3`, `SEQUENCE_LEN=10`, `HORIZON_DAYS=60`), predicting log-delta volumetric changes across `0.1`, `0.5`, and `0.9` quantiles.
+
+
+## Sample 60-Day Volumetric Forecast
+
+![Sample Patient 60-Day Forecast](results/graphs/PatientID_0003_forecast.png)
+
+*Longitudinal tumor volume trajectory showing treatment response (initial shrinkage), subsequent regrowth, and a 60-day probabilistic forecast with an 80% prediction interval (`P10`–`P90`)[cite: 92].*
+
+---
 
 ## Project Structure
 
